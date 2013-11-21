@@ -5,6 +5,7 @@ from flask import session, request
 from flask import render_template, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import gen_salt
+from flask_oauthlib.provider import OAuth2Provider
 
 
 app = Flask(__name__, template_folder='templates')
@@ -14,6 +15,7 @@ app.config.update({
     'SQLALCHEMY_DATABASE_URI': 'sqlite:///db.sqlite',
 })
 db = SQLAlchemy(app)
+oauth = OAuth2Provider(app)
 
 
 class User(db.Model):
@@ -93,6 +95,10 @@ def client():
         client_secret=item.client_secret,
     )
 
+
+@oauth.clientgetter
+def load_client(client_id):
+    return Client.query.filter_by(client_id=client_id).first()
 
 if __name__ == '__main__':
     db.create_all()
