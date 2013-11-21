@@ -1,5 +1,6 @@
 # coding: utf-8
 
+from datetime import datetime, timedelta
 from flask import Flask
 from flask import session, request
 from flask import render_template, redirect, jsonify
@@ -54,6 +55,39 @@ class Client(db.Model):
         return []
 
 
+class Grant(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer, db.ForeignKey('user.id', ondelete='CASCADE')
+    )
+    user = db.relationship('User')
+
+    client_id = db.Column(
+        db.String(40), db.ForeignKey('client.client_id'),
+        nullable=False,
+    )
+    client = db.relationship('Client')
+
+    code = db.Column(db.String(255), index=True, nullable=False)
+
+    redirect_uri = db.Column(db.String(255))
+    expires = db.Column(db.DateTime)
+
+    _scopes = db.Column(db.Text)
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self
+
+    @property
+    def scopes(self):
+        if self._scopes:
+            return self._scopes.split()
+        return []
+
+
 def current_user():
     if 'id' in session:
         uid = session['id']
@@ -99,6 +133,29 @@ def client():
 @oauth.clientgetter
 def load_client(client_id):
     return Client.query.filter_by(client_id=client_id).first()
+
+
+@oauth.grantgetter
+def load_grant(client_id, code):
+    return Grant.query.filter_by(client_id=client_id, code=code).first()
+
+
+@oauth.grantsetter
+def save_grant(client_id, code, request, *args, **kwargs):
+    # decide the expires time yourself
+    expires = datetime.utcnow() + timedelta(seconds=100)
+    grant = Grant(
+        client_id=client_id,
+        code=code['code'],
+        redirect_uri=request.redirect_uri,
+        _scopes=' '.join(request.scopes),
+        user=current_user(),
+        expires=expires
+    )
+    db.session.add(grant)
+    db.session.commit()
+    return grant
+
 
 if __name__ == '__main__':
     db.create_all()
