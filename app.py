@@ -198,17 +198,23 @@ def save_token(token, request, *args, **kwargs):
     toks = Token.query.filter_by(
         client_id=request.client.client_id,
         user_id=request.user.id
-    ).all()
+    )
     # make sure that every client has only one token connected to a user
-    db.session.delete(toks)
+    for t in toks:
+        db.session.delete(t)
 
     expires_in = token.pop('expires_in')
     expires = datetime.utcnow() + timedelta(seconds=expires_in)
 
-    tok = Token(**token)
-    tok.expires = expires
-    tok.client_id = request.client.client_id
-    tok.user_id = request.user.id
+    tok = Token(
+        access_token=token['access_token'],
+        refresh_token=token['refresh_token'],
+        token_type=token['token_type'],
+        _scopes=token['scope'],
+        expires=expires,
+        client_id=request.client.client_id,
+        user_id=request.user.id,
+    )
     db.session.add(tok)
     db.session.commit()
     return tok
