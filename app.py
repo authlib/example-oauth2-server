@@ -243,6 +243,13 @@ def authorize(*args, **kwargs):
     return confirm == 'yes'
 
 
+@app.route('/api/me')
+@oauth.require_oauth()
+def me(req):
+    user = req.user
+    return jsonify(username=user.username)
+
+
 if __name__ == '__main__':
     db.create_all()
     app.run()
