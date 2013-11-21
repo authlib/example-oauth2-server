@@ -88,6 +88,34 @@ class Grant(db.Model):
         return []
 
 
+class Token(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(
+        db.String(40), db.ForeignKey('client.client_id'),
+        nullable=False,
+    )
+    client = db.relationship('Client')
+
+    user_id = db.Column(
+        db.Integer, db.ForeignKey('user.id')
+    )
+    user = db.relationship('User')
+
+    # currently only bearer is supported
+    token_type = db.Column(db.String(40))
+
+    access_token = db.Column(db.String(255), unique=True)
+    refresh_token = db.Column(db.String(255), unique=True)
+    expires = db.Column(db.DateTime)
+    _scopes = db.Column(db.Text)
+
+    @property
+    def scopes(self):
+        if self._scopes:
+            return self._scopes.split()
+        return []
+
+
 def current_user():
     if 'id' in session:
         uid = session['id']
@@ -155,6 +183,35 @@ def save_grant(client_id, code, request, *args, **kwargs):
     db.session.add(grant)
     db.session.commit()
     return grant
+
+
+@oauth.tokengetter
+def load_token(access_token=None, refresh_token=None):
+    if access_token:
+        return Token.query.filter_by(access_token=access_token).first()
+    elif refresh_token:
+        return Token.query.filter_by(refresh_token=refresh_token).first()
+
+
+@oauth.tokensetter
+def save_token(token, request, *args, **kwargs):
+    toks = Token.query.filter_by(
+        client_id=request.client.client_id,
+        user_id=request.user.id
+    ).all()
+    # make sure that every client has only one token connected to a user
+    db.session.delete(toks)
+
+    expires_in = token.pop('expires_in')
+    expires = datetime.utcnow() + timedelta(seconds=expires_in)
+
+    tok = Token(**token)
+    tok.expires = expires
+    tok.client_id = request.client.client_id
+    tok.user_id = request.user.id
+    db.session.add(tok)
+    db.session.commit()
+    return tok
 
 
 if __name__ == '__main__':
