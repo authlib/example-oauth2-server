@@ -245,8 +245,8 @@ def authorize(*args, **kwargs):
 
 @app.route('/api/me')
 @oauth.require_oauth()
-def me(req):
-    user = req.user
+def me():
+    user = request.oauth.user
     return jsonify(username=user.username)
 
 
