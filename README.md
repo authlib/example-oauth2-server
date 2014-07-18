@@ -3,3 +3,7 @@
 This is an example of OAuth 2 Server.
 
 Find more details on <http://lepture.com/en/2013/create-oauth-server>
+
+# INSTALLATION
+
+$ pip install -r requirements.txt
