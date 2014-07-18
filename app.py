@@ -1,5 +1,8 @@
 # coding: utf-8
 
+import sys
+import logging
+
 from datetime import datetime, timedelta
 from flask import Flask
 from flask import session, request
@@ -8,6 +11,9 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import gen_salt
 from flask_oauthlib.provider import OAuth2Provider
 
+log = logging.getLogger('flask_oauthlib')
+log.addHandler(logging.StreamHandler(sys.stdout))
+log.setLevel(logging.DEBUG)
 
 app = Flask(__name__, template_folder='templates')
 app.debug = True
@@ -34,8 +40,12 @@ class Client(db.Model):
     _redirect_uris = db.Column(db.Text)
     _default_scopes = db.Column(db.Text)
 
+    is_confidential = db.Column(db.Boolean)
+
     @property
     def client_type(self):
+        if self.is_confidential:
+            return 'confidential'
         return 'public'
 
     @property
@@ -153,6 +163,7 @@ def client():
             'http://127.1:8000/authorized',
             ]),
         _default_scopes='email',
+        is_confidential=True,
         user_id=user.id,
     )
     db.session.add(item)
@@ -200,9 +211,13 @@ def load_token(access_token=None, refresh_token=None):
 
 @oauth.tokensetter
 def save_token(token, request, *args, **kwargs):
+    user = request.client
+    code = Grant.query.filter_by(code=request.code).first()
+    if code:
+        user = code
     toks = Token.query.filter_by(
         client_id=request.client.client_id,
-        user_id=request.user.id
+        user_id=user.user_id
     )
     # make sure that every client has only one token connected to a user
     for t in toks:
@@ -213,19 +228,19 @@ def save_token(token, request, *args, **kwargs):
 
     tok = Token(
         access_token=token['access_token'],
-        refresh_token=token['refresh_token'],
+        refresh_token=token.get('refresh_token'),
         token_type=token['token_type'],
         _scopes=token['scope'],
         expires=expires,
         client_id=request.client.client_id,
-        user_id=request.user.id,
+        user_id=user.user_id,
     )
     db.session.add(tok)
     db.session.commit()
     return tok
 
 
-@app.route('/oauth/token')
+@app.route('/oauth/token', methods=['GET', 'POST'])
 @oauth.token_handler
 def access_token():
     return None
