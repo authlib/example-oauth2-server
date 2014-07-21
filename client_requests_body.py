@@ -26,4 +26,4 @@ client = BackendApplicationClient(client_id=cid, scope='email', state='authtoken
 
 o = OAuth2Session(client=client)
 
-o.fetch_token(TOKEN_URL, client_secret=csecret)
+o.fetch_token(TOKEN_URL, client_id=cid, client_secret=csecret)
