@@ -1,4 +1,4 @@
 Flask==0.10.1
 Flask-SQLAlchemy==1.0
 werkzeug==0.9.4
-Flask-OAuthlib=>0.5.0
+Flask-OAuthlib>=0.5.0
