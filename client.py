@@ -35,8 +35,8 @@ def index():
 
 
 @app.route('/authorized')
-@remote.authorized_handler
-def authorized(resp):
+def authorized():
+    resp = remote.authorized_response()
     if resp is None:
         return 'Access denied: reason=%s error=%s' % (
             request.args['error_reason'],
