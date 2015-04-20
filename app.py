@@ -225,7 +225,7 @@ def save_token(token, request, *args, **kwargs):
     return tok
 
 
-@app.route('/oauth/token')
+@app.route('/oauth/token', methods=['GET', 'POST'])
 @oauth.token_handler
 def access_token():
     return None
