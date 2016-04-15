@@ -42,7 +42,7 @@ def authorized():
             request.args['error_reason'],
             request.args['error_description']
         )
-    print resp
+    print(resp)
     session['remote_oauth'] = (resp['access_token'], '')
     return jsonify(oauth_token=resp['access_token'])
 
