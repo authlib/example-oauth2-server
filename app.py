@@ -1,8 +1,9 @@
 # coding: utf-8
 
+import json
 from datetime import datetime, timedelta
 from flask import Flask
-from flask import session, request
+from flask import session, request, url_for
 from flask import render_template, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import gen_salt
@@ -133,6 +134,10 @@ def home():
             db.session.add(user)
             db.session.commit()
         session['id'] = user.id
+        if 'auth_args' in session: 
+            auth_args = json.loads(session.get('auth_args'))
+            session.pop('auth_args', None)
+            return redirect(url_for('authorize', response_type = str(auth_args['response_type']), client_id = str(auth_args['client_id']), redirect_uri = str(auth_args['redirect_uri'])))
         return redirect('/')
     user = current_user()
     return render_template('home.html', user=user)
@@ -236,17 +241,17 @@ def access_token():
 def authorize(*args, **kwargs):
     user = current_user()
     if not user:
-        return redirect('/')
+       session['auth_args'] = json.dumps({"response_type": kwargs.get('response_type'), "client_id": kwargs.get('client_id'), "redirect_uri": kwargs.get('redirect_uri')})
+       return redirect(url_for('home'))
     if request.method == 'GET':
         client_id = kwargs.get('client_id')
         client = Client.query.filter_by(client_id=client_id).first()
         kwargs['client'] = client
         kwargs['user'] = user
         return render_template('authorize.html', **kwargs)
-
     confirm = request.form.get('confirm', 'no')
     return confirm == 'yes'
-
+    
 
 @app.route('/api/me')
 @oauth.require_oauth()
