@@ -26,8 +26,16 @@ remote = oauth.remote_app(
 @app.route('/')
 def index():
     if 'remote_oauth' in session:
+        # the client has a token already
         resp = remote.get('me')
         return jsonify(resp.data)
+
+    # The client is not yet authorized threfore we:
+    #   1. call the "authorize()" method on the server side
+    #       (annotated with "@oauth.authorize_handler")
+    #   2. provide the "authorized()" callback method which sets
+    #       the session attribute "remote_oauth"
+    #   3. allow the client to invoke server side methods such as "me()"
     next_url = request.args.get('next') or request.referrer or None
     return remote.authorize(
         callback=url_for('authorized', next=next_url, _external=True)
