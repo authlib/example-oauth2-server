@@ -4,6 +4,30 @@ This is an example of OAuth 2 Server.
 
 Find more details on <http://lepture.com/en/2013/create-oauth-server>
 
+# OAuth 2.0
+
+The OAuth 2.0 Authorization Framework is described by
+[rfc6749](https://tools.ietf.org/html/rfc6749)
+
+
+     +--------+                               +---------------+
+     |        |--(A)- Authorization Request ->|   Resource    |
+     |        |                               |     Owner     |
+     |        |<-(B)-- Authorization Grant ---|               |
+     |        |                               +---------------+
+     |        |
+     |        |                               +---------------+
+     |        |--(C)-- Authorization Grant -->| Authorization |
+     | Client |                               |     Server    |
+     |        |<-(D)----- Access Token -------|               |
+     |        |                               +---------------+
+     |        |
+     |        |                               +---------------+
+     |        |--(E)----- Access Token ------>|    Resource   |
+     |        |                               |     Server    |
+     |        |<-(F)--- Protected Resource ---|               |
+     +--------+                               +---------------+
+
 # Installation
 
     $ pip install -r requirements.txt
