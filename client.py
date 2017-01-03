@@ -2,8 +2,8 @@ from flask import Flask, url_for, session, request, jsonify
 from flask_oauthlib.client import OAuth
 
 
-CLIENT_ID = 'GbRmKgbSMmlE2NlugMeFfQIba8hoVyBFsWS8Igsq'
-CLIENT_SECRET = 'BfP7jsN8dSsXjGLfTTPiEvarMJOpkZQ2Y7IVVee8X929LfolMV'
+CLIENT_ID = 'fjgYLsggTteiqr2kgExsyeJzQ0IGYhqwSZOMUcyU'
+CLIENT_SECRET = 'jV5w8kvn7IHqEd8Qa6fLsy9DusctouUKcD4W1uBnjrrAuEIYYg'
 
 
 app = Flask(__name__)
@@ -56,4 +56,4 @@ if __name__ == '__main__':
     import os
     os.environ['DEBUG'] = 'true'
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = 'true'
-    app.run(host='localhost', port=8000)
+    app.run(host='0.0.0.0', port=8000)
