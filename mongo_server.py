@@ -21,12 +21,12 @@ oauth = OAuth2Provider(app)
 
 
 class User(db.Document):
-    username = db.StringField()
+    username = db.StringField(unique=True)
 
 
 class Client(db.Document):
-    client_id = db.StringField()
-    client_secret = db.StringField()
+    client_id = db.StringField(primary_key=True)
+    client_secret = db.StringField(required=True)
 
     user = db.ReferenceField(User)
 
@@ -55,12 +55,12 @@ class Client(db.Document):
 
 
 class Grant(db.Document):
-    user = db.ReferenceField(User)
+    user = db.ReferenceField(User, reverse_delete_rule=db.CASCADE)
 
     client_id = db.StringField()
     client = db.ReferenceField(Client)
 
-    code = db.StringField()
+    code = db.StringField(required=True)
 
     redirect_uri = db.StringField()
     expires = db.DateTimeField()
@@ -84,8 +84,8 @@ class Token(db.Document):
     # currently only bearer is supported
     token_type = db.StringField()
 
-    access_token = db.StringField()
-    refresh_token = db.StringField()
+    access_token = db.StringField(unique=True)
+    refresh_token = db.StringField(unique=True)
     expires = db.DateTimeField()
     _scopes = db.StringField()
 
