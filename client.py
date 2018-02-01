@@ -27,7 +27,9 @@ remote = oauth.remote_app(
 def index():
     if 'remote_oauth' in session:
         resp = remote.get('me')
-        return jsonify(resp.data)
+        if resp.status >= 200 and resp.status <= 299:
+            return jsonify(resp.data)
+        return resp.data
     next_url = request.args.get('next') or request.referrer or None
     return remote.authorize(
         callback=url_for('authorized', next=next_url, _external=True)
