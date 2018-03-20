@@ -16,6 +16,9 @@ class User(db.Model):
     def __str__(self):
         return self.username
 
+    def get_user_id(self):
+        return self.id
+
     def check_password(self, password):
         return password == 'valid'
 

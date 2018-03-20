@@ -1,0 +1,18 @@
+<p>{{grant.client.client_name}} is requesting:
+<strong>{{ grant.request.scope }}</strong>
+</p>
+
+<form action="" method="post">
+  <label>
+    <input type="checkbox" name="confirm">
+    <span>Consent?</span>
+  </label>
+  {% if not user %}
+  <p>You haven't logged in. Log in with:</p>
+  <div>
+    <input type="text" name="username">
+  </div>
+  {% endif %}
+  <br>
+  <button>Submit</button>
+</form>
