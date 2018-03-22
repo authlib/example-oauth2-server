@@ -1,4 +1,3 @@
-import os
 from website.app import create_app
 
 
