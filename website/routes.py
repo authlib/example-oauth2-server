@@ -36,6 +36,12 @@ def home():
     return render_template('home.html', user=user, clients=clients)
 
 
+@bp.route('/logout')
+def logout():
+    del session['id']
+    return redirect('/')
+
+
 @bp.route('/create_client', methods=('GET', 'POST'))
 def create_client():
     user = current_user()

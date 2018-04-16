@@ -1,6 +1,6 @@
 {% if user %}
-  <style>pre{white-space:wrap}</style>
-<div>Logged in as <strong>{{user}}</strong></div>
+<style>pre{white-space:wrap}</style>
+<div>Logged in as <strong>{{user}}</strong> (<a href="{{ url_for('.logout') }}">Log Out</a>)</div>
 
 {% for client in clients %}
 <pre>
