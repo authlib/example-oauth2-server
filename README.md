@@ -4,6 +4,9 @@ This is an example of OAuth 2.0 server in [Authlib](https://authlib.org/).
 If you are looking for old Flask-OAuthlib implementation, check the
 `flask-oauthlib` branch.
 
+- Documentation: <https://docs.authlib.org/en/latest/flask/oauth2.html>
+- Authlib Repo: <https://github.com/lepture/authlib>
+
 ## Take a quick look
 
 This is a ready to run example, let's take a quick experience at first. To
@@ -77,9 +80,7 @@ working well.
 ```python
 # website/routes.py
 from Flask import Blueprint
-
 bp = Blueprint(__name__, 'home')
-
 
 @bp.route('/')
 def home():
@@ -89,7 +90,6 @@ def home():
 ```python
 # website/app.py
 from flask import Flask
-
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -104,7 +104,6 @@ def create_app(config=None):
 
 ```python
 # app.py
-
 from website.app import create_app
 
 app = create_app({
