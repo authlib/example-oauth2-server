@@ -16,8 +16,6 @@ run the example, we need to install all the dependencies:
 
 Set Flask and Authlib environment variables:
 
-    $ export FLASK_APP=app.py
-    $ export FLASK_DEBUG=1
     # disable check https (DO NOT SET THIS IN PRODUCTION)
     $ export AUTHLIB_INSECURE_TRANSPORT=1
 
@@ -40,6 +38,8 @@ have enabled `password` grant types, let's try:
 
 Because this is an example, every user's password is `valid`. For now, you
 can read the source in example or follow the long boring tutorial below.
+
+**IMPORTANT**: To test implicit grant, you need to `token_endpoint_auth_method` to `none`.
 
 ## Preparation
 
@@ -134,6 +134,15 @@ from authlib.specs.rfc6749 import (
 )
 ```
 
-## Configure OAuth 2.0 Provider
+## Implement Grants
 
-The source code is in `website/oauth2.py`.
+The source code is in `website/oauth2.py`. There are four standard grant types:
+
+- Authorization Code Grant
+- Implicit Grant
+- Client Credentials Grant
+- Resource Owner Password Credentials Grant
+
+And Refresh Token is implemented as a Grant in Authlib. You don't have to do
+any thing on Implicit and Client Credentials grants, but there are missing
+methods to be implemented in other grants, checkout the source code.
