@@ -82,7 +82,6 @@ def authorize():
 
 @bp.route('/oauth/token', methods=['POST'])
 def issue_token():
-    print(request.form)
     return authorization.create_token_response()
 
 

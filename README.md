@@ -131,17 +131,14 @@ We will use SQLAlchemy and SQLite for our models. You can also use other
 databases and other ORM engines. Authlib has some built-in SQLAlchemy mixins
 which will make it easier for creating models.
 
-The code is located in `website/models.py`. Read it yourself. If you don't
-want to use SQLAlchemy, you need to implement the missing methods yourself,
-which you can find by:
+Let's create the models in `website/models.py`. We need four models, which are
 
-```python
-from authlib.specs.rfc6749 import (
-    ClientMixin,
-    AuthorizationCodeMixin,
-    TokenMixin
-)
-```
+- User: you need a user to test and create your application
+- OAuth2Client: the oauth client model
+- OAuth2AuthorizationCode: for `grant_type=code` flow
+- OAuth2Token: save the `access_token` in this model.
+
+Check how to define these models in `website/models.py`.
 
 ## Implement Grants
 
@@ -154,4 +151,58 @@ The source code is in `website/oauth2.py`. There are four standard grant types:
 
 And Refresh Token is implemented as a Grant in Authlib. You don't have to do
 any thing on Implicit and Client Credentials grants, but there are missing
-methods to be implemented in other grants, checkout the source code.
+methods to be implemented in other grants, checkout the source code in
+`website/oauth2.py`.
+
+
+## `@require_oauth`
+
+Authlib has provided a `ResourceProtector` for you to create the decorator
+`@require_oauth`, which can be easily implemented:
+
+```py
+from authlib.flask.oauth2 import ResourceProtector
+
+require_oauth = ResourceProtector()
+```
+
+For now, only Bearer Token is supported. Let's add bearer token validator to
+this ResourceProtector:
+
+```py
+from authlib.flask.oauth2.sqla import create_bearer_token_validator
+
+# helper function: create_bearer_token_validator
+bearer_cls = create_bearer_token_validator(db.session, OAuth2Token)
+require_oauth.register_token_validator(bearer_cls())
+```
+
+Check the full implementation in `website/oauth2.py`.
+
+
+## OAuth Routes
+
+For OAuth server itself, we only need to implement routes for authentication,
+and issuing tokens. Since we have added token revocation feature, we need a
+route for revoking too.
+
+Checkout these routes in `website/routes.py`. Their path begin with `/oauth/`.
+
+
+## Other Routes
+
+But that is not enough. In this demo, you will need to have some web pages to
+create and manage your OAuth clients. Check that `/create_client` route.
+
+And we have an API route for testing. Check the code of `/api/me`.
+
+## Finish
+
+Now, init everything in `website/app.py`. And here you go. You've got an OAuth
+2.0 server.
+
+Read more information on <https://docs.authlib.org/>.
+
+## License
+
+Same license with [Authlib](https://authlib.org/plans).
