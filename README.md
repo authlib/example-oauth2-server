@@ -43,7 +43,7 @@ Before testing, we need to create a client:
 Get your `client_id` and `client_secret` for testing. In this example, we
 have enabled `password` grant types, let's try:
 
-    $ curl -u ${client_id}:${client_secret} -XPOST http://127.0.0.1:5000/oauth/token -F grant_type=password -F username=${username} -F password=valid
+    $ curl -u ${client_id}:${client_secret} -XPOST http://127.0.0.1:5000/oauth/token -F grant_type=password -F username=${username} -F password=valid -F scope=profile
 
 Because this is an example, every user's password is `valid`. For now, you
 can read the source in example or follow the long boring tutorial below.
