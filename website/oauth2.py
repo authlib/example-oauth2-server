@@ -58,7 +58,6 @@ class RefreshTokenGrant(grants.RefreshTokenGrant):
 
 query_client = create_query_client_func(db.session, OAuth2Client)
 save_token = create_save_token_func(db.session, OAuth2Token)
-# Authlib 0.8 has a bug in init_app
 authorization = AuthorizationServer(
     query_client=query_client,
     save_token=save_token,
