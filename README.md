@@ -109,6 +109,9 @@ def create_app(config=None):
         elif config.endswith('.py'):
             app.config.from_pyfile(config)
     return app
+    
+def setup_app(app):
+    app.register_blueprint(bp, url_prefix='')
 ```
 
 ```python
