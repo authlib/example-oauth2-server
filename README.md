@@ -88,7 +88,7 @@ working well.
 
 ```python
 # website/routes.py
-from Flask import Blueprint
+from flask import Blueprint
 bp = Blueprint(__name__, 'home')
 
 @bp.route('/')
