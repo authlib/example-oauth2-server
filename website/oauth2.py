@@ -5,7 +5,7 @@ from authlib.flask.oauth2.sqla import (
     create_revocation_endpoint,
     create_bearer_token_validator,
 )
-from authlib.specs.rfc6749 import grants
+from authlib.oauth2.rfc6749 import grants
 from werkzeug.security import gen_salt
 from .models import db, User
 from .models import OAuth2Client, OAuth2AuthorizationCode, OAuth2Token
