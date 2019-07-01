@@ -12,7 +12,7 @@ from .models import OAuth2Client, OAuth2AuthorizationCode, OAuth2Token
 
 
 class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
-    def create_authorization_code(self, client, user, request):
+    def create_authorization_code(self, client, grant_user, request):
         code = gen_salt(48)
         item = OAuth2AuthorizationCode(
             code=code,
