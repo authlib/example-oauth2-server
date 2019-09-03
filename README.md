@@ -4,7 +4,7 @@ This is an example of OAuth 2.0 server in [Authlib](https://authlib.org/).
 If you are looking for old Flask-OAuthlib implementation, check the
 `flask-oauthlib` branch.
 
-- Documentation: <https://docs.authlib.org/en/latest/flask/oauth2.html>
+- Documentation: <https://docs.authlib.org/en/latest/flask/2/>
 - Authlib Repo: <https://github.com/lepture/authlib>
 
 ## Sponsors
