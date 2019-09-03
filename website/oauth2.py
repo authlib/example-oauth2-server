@@ -49,11 +49,16 @@ class PasswordGrant(grants.ResourceOwnerPasswordCredentialsGrant):
 class RefreshTokenGrant(grants.RefreshTokenGrant):
     def authenticate_refresh_token(self, refresh_token):
         token = OAuth2Token.query.filter_by(refresh_token=refresh_token).first()
-        if token and not token.revoked and not token.is_refresh_token_expired():
+        if token and token.is_refresh_token_active():
             return token
 
     def authenticate_user(self, credential):
         return User.query.get(credential.user_id)
+
+    def revoke_old_credential(self, credential):
+        credential.revoked = True
+        db.session.add(credential)
+        db.session.commit()
 
 
 query_client = create_query_client_func(db.session, OAuth2Client)
