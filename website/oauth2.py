@@ -14,12 +14,15 @@ from .models import OAuth2Client, OAuth2AuthorizationCode, OAuth2Token
 class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
     def create_authorization_code(self, client, grant_user, request):
         code = gen_salt(48)
+        user = User.query.filter_by(username=str(grant_user)).first()
+        if user is not None:
+            user_id = user.get_user_id()
         item = OAuth2AuthorizationCode(
             code=code,
             client_id=client.client_id,
             redirect_uri=request.redirect_uri,
             scope=request.scope,
-            user_id=user.id,
+            user_id=user_id,
         )
         db.session.add(item)
         db.session.commit()
