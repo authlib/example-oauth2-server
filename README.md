@@ -62,6 +62,7 @@ Here is our Flask website structure:
 app.py         --- FLASK_APP
 website/
   app.py       --- Flask App Factory
+  __init__.py  --- module initialization (empty)
   models.py    --- SQLAlchemy Models
   oauth2.py    --- OAuth 2.0 Provider Configuration
   routes.py    --- Routes views
@@ -119,6 +120,7 @@ app = create_app({
 })
 ```
 
+Create an empty ```__init__.py``` file in the ```website``` folder.
 
 The "Hello World!" example should run properly:
 
