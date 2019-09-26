@@ -235,10 +235,10 @@ create and manage your OAuth clients. Check that `/create_client` route.
 
 And we have an API route for testing. Check the code of `/api/me`.
 
+
 ## Finish
 
-Now, init everything in `website/app.py`. And here you go. You've got an OAuth
-2.0 server.
+Here you go. You've got an OAuth 2.0 server.
 
 Read more information on <https://docs.authlib.org/>.
 
