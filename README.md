@@ -99,6 +99,7 @@ def home():
 ```python
 # website/app.py
 from flask import Flask
+from .routes import bp
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -108,7 +109,11 @@ def create_app(config=None):
             app.config.update(config)
         elif config.endswith('.py'):
             app.config.from_pyfile(config)
+    setup_app(app)
     return app
+
+def setup_app(app):
+    app.register_blueprint(bp, url_prefix='')
 ```
 
 ```python
