@@ -156,8 +156,8 @@ The source code is in `website/oauth2.py`. There are four standard grant types:
 - Resource Owner Password Credentials Grant
 
 And Refresh Token is implemented as a Grant in Authlib. You don't have to do
-any thing on Implicit and Client Credentials grants, but there are missing
-methods to be implemented in other grants, checkout the source code in
+anything on Implicit and Client Credentials grants, but there are missing
+methods to be implemented in other grants. Check out the source code in
 `website/oauth2.py`.
 
 
