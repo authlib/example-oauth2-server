@@ -30,7 +30,6 @@ Set Flask and Authlib environment variables:
 
 Create Database and run the development server:
 
-    $ flask initdb
     $ flask run
 
 Now, you can open your browser with `http://127.0.0.1:5000/`, login with any
