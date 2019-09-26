@@ -146,6 +146,23 @@ Let's create the models in `website/models.py`. We need four models, which are
 
 Check how to define these models in `website/models.py`.
 
+Once you've created your own `website/models.py` (or copied our version), you'll need to import the database object `db`. Add the line `from .models import db` just after `from flask import Flask` in your scratch-built version of `website/app.py`.
+
+To initialize the database upon startup, if no tables exist, you'll add a few lines to the `setup_app()` function in `website/app.py` so that it now looks like:
+
+```
+def setup_app(app):
+    # Create tables if they do not exist already
+    @app.before_first_request
+    def create_tables():
+        db.create_all()
+
+    db.init_app(app)
+    app.register_blueprint(bp, url_prefix='')
+```
+
+You can try running the app again as above to make sure it works.
+
 ## Implement Grants
 
 The source code is in `website/oauth2.py`. There are four standard grant types:
@@ -160,6 +177,22 @@ anything on Implicit and Client Credentials grants, but there are missing
 methods to be implemented in other grants. Check out the source code in
 `website/oauth2.py`.
 
+Once you've created your own `website/oauth2.py`, import the oauth2 config object from the oauth2 module. Add the line `from .oauth2 import config_oauth` just after the import you added above in your scratch-built version of `website/app.py`.
+
+To initialize the oauth object, add `config_oauth(app)` to the `setup_app()` function, just before the line that starts with `app.register_blueprint` so it looks like:
+
+```
+def setup_app(app):
+    # Create tables if they do not exist already
+    @app.before_first_request
+    def create_tables():
+        db.create_all()
+
+    db.init_app(app)
+    config_oauth(app)
+    app.register_blueprint(bp, url_prefix='')
+```
+You can try running the app again as above to make sure it still works.
 
 ## `@require_oauth`
 
