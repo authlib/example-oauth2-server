@@ -30,7 +30,6 @@ Set Flask and Authlib environment variables:
 
 Create Database and run the development server:
 
-    $ flask initdb
     $ flask run
 
 Now, you can open your browser with `http://127.0.0.1:5000/`, login with any
@@ -63,6 +62,7 @@ Here is our Flask website structure:
 app.py         --- FLASK_APP
 website/
   app.py       --- Flask App Factory
+  __init__.py  --- module initialization (empty)
   models.py    --- SQLAlchemy Models
   oauth2.py    --- OAuth 2.0 Provider Configuration
   routes.py    --- Routes views
@@ -99,6 +99,7 @@ def home():
 ```python
 # website/app.py
 from flask import Flask
+from .routes import bp
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -108,7 +109,11 @@ def create_app(config=None):
             app.config.update(config)
         elif config.endswith('.py'):
             app.config.from_pyfile(config)
+    setup_app(app)
     return app
+
+def setup_app(app):
+    app.register_blueprint(bp, url_prefix='')
 ```
 
 ```python
@@ -120,6 +125,7 @@ app = create_app({
 })
 ```
 
+Create an empty ```__init__.py``` file in the ```website``` folder.
 
 The "Hello World!" example should run properly:
 
@@ -140,6 +146,23 @@ Let's create the models in `website/models.py`. We need four models, which are
 
 Check how to define these models in `website/models.py`.
 
+Once you've created your own `website/models.py` (or copied our version), you'll need to import the database object `db`. Add the line `from .models import db` just after `from flask import Flask` in your scratch-built version of `website/app.py`.
+
+To initialize the database upon startup, if no tables exist, you'll add a few lines to the `setup_app()` function in `website/app.py` so that it now looks like:
+
+```
+def setup_app(app):
+    # Create tables if they do not exist already
+    @app.before_first_request
+    def create_tables():
+        db.create_all()
+
+    db.init_app(app)
+    app.register_blueprint(bp, url_prefix='')
+```
+
+You can try running the app again as above to make sure it works.
+
 ## Implement Grants
 
 The source code is in `website/oauth2.py`. There are four standard grant types:
@@ -150,10 +173,26 @@ The source code is in `website/oauth2.py`. There are four standard grant types:
 - Resource Owner Password Credentials Grant
 
 And Refresh Token is implemented as a Grant in Authlib. You don't have to do
-any thing on Implicit and Client Credentials grants, but there are missing
-methods to be implemented in other grants, checkout the source code in
+anything on Implicit and Client Credentials grants, but there are missing
+methods to be implemented in other grants. Check out the source code in
 `website/oauth2.py`.
 
+Once you've created your own `website/oauth2.py`, import the oauth2 config object from the oauth2 module. Add the line `from .oauth2 import config_oauth` just after the import you added above in your scratch-built version of `website/app.py`.
+
+To initialize the oauth object, add `config_oauth(app)` to the `setup_app()` function, just before the line that starts with `app.register_blueprint` so it looks like:
+
+```
+def setup_app(app):
+    # Create tables if they do not exist already
+    @app.before_first_request
+    def create_tables():
+        db.create_all()
+
+    db.init_app(app)
+    config_oauth(app)
+    app.register_blueprint(bp, url_prefix='')
+```
+You can try running the app again as above to make sure it still works.
 
 ## `@require_oauth`
 
@@ -196,10 +235,10 @@ create and manage your OAuth clients. Check that `/create_client` route.
 
 And we have an API route for testing. Check the code of `/api/me`.
 
+
 ## Finish
 
-Now, init everything in `website/app.py`. And here you go. You've got an OAuth
-2.0 server.
+Here you go. You've got an OAuth 2.0 server.
 
 Read more information on <https://docs.authlib.org/>.
 
