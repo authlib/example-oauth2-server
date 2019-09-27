@@ -19,7 +19,7 @@ class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
             client_id=client.client_id,
             redirect_uri=request.redirect_uri,
             scope=request.scope,
-            user_id=user.id,
+            user_id=grant_user.id,
         )
         db.session.add(item)
         db.session.commit()
