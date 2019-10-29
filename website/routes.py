@@ -1,7 +1,7 @@
 from flask import Blueprint, request, session
 from flask import render_template, redirect, jsonify
 from werkzeug.security import gen_salt
-from authlib.flask.oauth2 import current_token
+from authlib.integrations.flask_oauth2 import current_token
 from authlib.oauth2 import OAuth2Error
 from .models import db, User, OAuth2Client
 from .oauth2 import authorization, require_oauth
@@ -49,9 +49,9 @@ def create_client():
         return redirect('/')
     if request.method == 'GET':
         return render_template('create_client.html')
-    client = OAuth2Client(**request.form.to_dict(flat=True))
-    client.user_id = user.id
-    client.client_id = gen_salt(24)
+    client_id = gen_salt(24)
+    client = OAuth2Client(client_id=client_id, user_id=user.id)
+    client.client_metadata = request.form.to_dict(flat=True)
     if client.token_endpoint_auth_method == 'none':
         client.client_secret = ''
     else:
