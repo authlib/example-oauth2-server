@@ -49,13 +49,31 @@ def create_client():
         return redirect('/')
     if request.method == 'GET':
         return render_template('create_client.html')
+
     client_id = gen_salt(24)
-    client = OAuth2Client(client_id=client_id, user_id=user.id)
-    client.client_metadata = request.form.to_dict(flat=True)
+    client_id_issued_at = int(time.time())
+    client = OAuth2Client(
+        client_id=client_id,
+        client_id_issued_at=client_id_issued_at,
+        user_id=user.id,
+    )
+
     if client.token_endpoint_auth_method == 'none':
         client.client_secret = ''
     else:
         client.client_secret = gen_salt(48)
+
+    form = request.form
+    client_metadata = {
+        "client_name": form["client_name"],
+        "client_uri": form["client_uri"],
+        "grant_types": split_by_crlf(form["grant_type"]),
+        "redirect_uris": split_by_crlf(form["redirect_uri"]),
+        "response_types": split_by_crlf(form["response_type"]),
+        "scope": form["scope"],
+        "token_endpoint_auth_method": form["token_endpoint_auth_method"]
+    }
+    client.set_client_metadata(client_metadata)
     db.session.add(client)
     db.session.commit()
     return redirect('/')
