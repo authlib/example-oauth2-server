@@ -17,6 +17,10 @@ def current_user():
     return None
 
 
+def split_by_crlf(s):
+    return [v for v in s.splitlines() if v]
+
+
 @bp.route('/', methods=('GET', 'POST'))
 def home():
     if request.method == 'POST':
