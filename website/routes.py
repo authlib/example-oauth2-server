@@ -68,11 +68,6 @@ def create_client():
         user_id=user.id,
     )
 
-    if client.token_endpoint_auth_method == 'none':
-        client.client_secret = ''
-    else:
-        client.client_secret = gen_salt(48)
-
     form = request.form
     client_metadata = {
         "client_name": form["client_name"],
@@ -84,6 +79,12 @@ def create_client():
         "token_endpoint_auth_method": form["token_endpoint_auth_method"]
     }
     client.set_client_metadata(client_metadata)
+
+    if form['token_endpoint_auth_method'] == 'none':
+        client.client_secret = ''
+    else:
+        client.client_secret = gen_salt(48)
+
     db.session.add(client)
     db.session.commit()
     return redirect('/')
