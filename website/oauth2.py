@@ -10,7 +10,6 @@ from authlib.integrations.sqla_oauth2 import (
 )
 from authlib.oauth2.rfc6749 import grants
 from authlib.oauth2.rfc7636 import CodeChallenge
-from werkzeug.security import gen_salt
 from .models import db, User
 from .models import OAuth2Client, OAuth2AuthorizationCode, OAuth2Token
 
