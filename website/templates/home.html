@@ -4,8 +4,14 @@
 
 {% for client in clients %}
 <pre>
-{{ client.client_info|tojson }}
-{{ client.client_metadata|tojson }}
+<strong>Client Info</strong>
+  {%- for key in client.client_info %}
+  <strong>{{ key }}: </strong>{{ client.client_info[key] }}
+  {%- endfor %}
+<strong>Client Metadata</strong>
+  {%- for key in client.client_metadata %}
+  <strong>{{ key }}: </strong>{{ client.client_metadata[key] }}
+  {%- endfor %}
 </pre>
 <hr>
 {% endfor %}
