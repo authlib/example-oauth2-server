@@ -52,8 +52,13 @@ have enabled `password` grant types, let's try:
 $ curl -u ${client_id}:${client_secret} -XPOST http://127.0.0.1:5000/oauth/token -F grant_type=password -F username=${username} -F password=valid -F scope=profile
 ```
 
-Because this is an example, every user's password is `valid`. For now, you
-can read the source in example or follow the long boring tutorial below.
+Because this is an example, every user's password is `valid`. Now you can access `/api/me`:
+
+```bash
+$ curl -H "Authorization: Bearer ${access_token}" http://127.0.0.1:5000/api/me
+```
+
+For now, you can read the source in example or follow the long boring tutorial below.
 
 **IMPORTANT**: To test implicit grant, you need to `token_endpoint_auth_method` to `none`.
 
