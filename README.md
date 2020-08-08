@@ -21,16 +21,22 @@ If you are looking for old Flask-OAuthlib implementation, check the
 This is a ready to run example, let's take a quick experience at first. To
 run the example, we need to install all the dependencies:
 
-    $ pip install -r requirements.txt
+```bash
+$ pip install -r requirements.txt
+```
 
 Set Flask and Authlib environment variables:
 
-    # disable check https (DO NOT SET THIS IN PRODUCTION)
-    $ export AUTHLIB_INSECURE_TRANSPORT=1
+```bash
+# disable check https (DO NOT SET THIS IN PRODUCTION)
+$ export AUTHLIB_INSECURE_TRANSPORT=1
+```
 
 Create Database and run the development server:
 
-    $ flask run
+```bash
+$ flask run
+```
 
 Now, you can open your browser with `http://127.0.0.1:5000/`, login with any
 name you want.
@@ -42,7 +48,9 @@ Before testing, we need to create a client:
 Get your `client_id` and `client_secret` for testing. In this example, we
 have enabled `password` grant types, let's try:
 
-    $ curl -u ${client_id}:${client_secret} -XPOST http://127.0.0.1:5000/oauth/token -F grant_type=password -F username=${username} -F password=valid -F scope=profile
+```
+$ curl -u ${client_id}:${client_secret} -XPOST http://127.0.0.1:5000/oauth/token -F grant_type=password -F username=${username} -F password=valid -F scope=profile
+```
 
 Because this is an example, every user's password is `valid`. For now, you
 can read the source in example or follow the long boring tutorial below.
@@ -150,7 +158,7 @@ Once you've created your own `website/models.py` (or copied our version), you'll
 
 To initialize the database upon startup, if no tables exist, you'll add a few lines to the `setup_app()` function in `website/app.py` so that it now looks like:
 
-```
+```python
 def setup_app(app):
     # Create tables if they do not exist already
     @app.before_first_request
@@ -181,7 +189,7 @@ Once you've created your own `website/oauth2.py`, import the oauth2 config objec
 
 To initialize the oauth object, add `config_oauth(app)` to the `setup_app()` function, just before the line that starts with `app.register_blueprint` so it looks like:
 
-```
+```python
 def setup_app(app):
     # Create tables if they do not exist already
     @app.before_first_request
