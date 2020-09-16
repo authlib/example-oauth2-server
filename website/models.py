@@ -23,6 +23,17 @@ class User(db.Model):
         return password == 'valid'
 
 
+class Consent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
+    user = db.relationship('User')
+    oauth2_client_id = db.Column(
+        db.Integer, db.ForeignKey('oauth2_client.id', ondelete='CASCADE'))
+    oauth2_client = db.relationship('OAuth2Client')
+    scope = db.Column(db.String, nullable=False)
+
+
 class OAuth2Client(db.Model, OAuth2ClientMixin):
     __tablename__ = 'oauth2_client'
 

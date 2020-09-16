@@ -4,7 +4,7 @@ from flask import render_template, redirect, jsonify
 from werkzeug.security import gen_salt
 from authlib.integrations.flask_oauth2 import current_token
 from authlib.oauth2 import OAuth2Error
-from .models import db, User, OAuth2Client
+from .models import db, User, OAuth2Client, Consent
 from .oauth2 import authorization, require_oauth
 
 
@@ -96,15 +96,34 @@ def authorize():
     # if user log status is not true (Auth server), then to log it in
     if not user:
         return redirect(url_for('website.routes.home', next=request.url))
+
+    consent = Consent.query.filter_by(
+        user_id=user.id,
+        oauth2_client_id=request.args.get("client_id"),
+        scope=request.args.get("scope"),
+    ).all()
+    if consent:
+        return authorization.create_authorization_response(grant_user=user)
+
     if request.method == 'GET':
         try:
             grant = authorization.validate_consent_request(end_user=user)
         except OAuth2Error as error:
             return error.error
+
+        consent = Consent(
+            user_id=user.id,
+            oauth2_client_id=request.args.get("client_id"),
+            scope=request.args.get("scope"),
+        )
+        db.session.add(consent)
+        db.session.commit()
         return render_template('authorize.html', user=user, grant=grant)
+
     if not user and 'username' in request.form:
         username = request.form.get('username')
         user = User.query.filter_by(username=username).first()
+
     if request.form['confirm']:
         grant_user = user
     else:
