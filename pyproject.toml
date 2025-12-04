@@ -1,0 +1,16 @@
+[project]
+name = "example-oauth2-server"
+version = "0.1.0"
+description = "Example for OAuth 2 Server for Authlib."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "authlib>=1.6.5",
+    "flask>=3.1.2",
+    "flask-SQLAlchemy>=3.1.1",
+]
+
+[dependency-groups]
+dev = [
+    "prek>=0.2.19",
+]
