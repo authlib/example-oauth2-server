@@ -22,7 +22,7 @@ This is a ready to run example, let's take a quick experience at first. To
 run the example, we need to install all the dependencies:
 
 ```bash
-$ pip install -r requirements.txt
+$ uv sync
 ```
 
 Set Flask and Authlib environment variables:
@@ -35,7 +35,7 @@ $ export AUTHLIB_INSECURE_TRANSPORT=1
 Create Database and run the development server:
 
 ```bash
-$ flask run
+$ uv run flask run
 ```
 
 Now, you can open your browser with `http://127.0.0.1:5000/`, login with any
