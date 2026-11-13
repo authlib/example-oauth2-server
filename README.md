@@ -1,289 +1,162 @@
-# How to create an OAuth 2.0 Provider
+# Authlib server demo
 
-This is an example of OAuth 2.0 server in [Authlib](https://authlib.org/).
-If you are looking for old Flask-OAuthlib implementation, check the
-`flask-oauthlib` branch.
+An OAuth 2.0 authorization server built with [Authlib](https://authlib.org/).
+Run it to test and debug an OAuth 2.0 client, or deploy it to try the server features of Authlib.
 
-- Documentation: <https://docs.authlib.org/en/latest/flask/2/>
-- Authlib Repo: <https://github.com/lepture/authlib>
+This page explains how to run and configure the server.
+It assumes basic knowledge of OAuth 2.0.
+To build a server with Authlib, read the [Authlib documentation](https://docs.authlib.org/).
 
-## Sponsors
+## Features
 
-<table>
-  <tr>
-    <td><img align="middle" width="48" src="https://user-images.githubusercontent.com/290496/39297078-89d00928-497d-11e8-8119-0c53afe14cd0.png"></td>
-    <td>If you want to quickly add secure token-based authentication to Python projects, feel free to check Auth0's Python SDK and free plan at <a href="https://auth0.com/overview?utm_source=GHsponsor&utm_medium=GHsponsor&utm_campaign=example-oauth2-server">auth0.com/overview</a>.</td>
-  </tr>
-</table>
+The server supports these grants and endpoints:
 
-## Take a quick look
+- Authorization code grant, with PKCE (RFC 7636). Public clients must use PKCE.
+- Implicit grant.
+- Resource owner password credentials grant.
+- Client credentials grant.
+- Refresh token grant.
+- Token revocation (RFC 7009).
+- A protected resource, `/api/me`, that needs the `profile` scope.
 
-This is a ready to run example, let's take a quick experience at first. To
-run the example, we need to install all the dependencies:
+## Run the server
 
-```bash
-$ uv sync
-```
-
-Set Flask and Authlib environment variables:
+Run the server from the source code with [uv](https://docs.astral.sh/uv/):
 
 ```bash
-# disable check https (DO NOT SET THIS IN PRODUCTION)
-$ export AUTHLIB_INSECURE_TRANSPORT=1
+uv run authlib-server-demo
 ```
 
-Create Database and run the development server:
+The server listens on `http://127.0.0.1:5000`.
+It stores its data in a SQLite database in the Flask instance folder.
+
+Run the server with Docker:
 
 ```bash
-$ uv run authlib-server-demo
+docker build -t authlib-server-demo .
+docker run -p 5000:5000 -v authlib-server-demo:/data authlib-server-demo
 ```
 
-Now, you can open your browser with `http://127.0.0.1:5000/`, login with any
-name you want.
+The container stores the database in `/data`.
+The volume keeps the data when the container is removed.
 
-Before testing, we need to create a client:
+## Try the password grant
 
-![create a client](https://user-images.githubusercontent.com/290496/38811988-081814d4-41c6-11e8-88e1-cb6c25a6f82e.png)
+Open `http://127.0.0.1:5000/` and log in with any user name.
+The server creates the user at the first login.
+The password of every user is `valid`.
 
-### Password flow example
+Then create a client:
 
-Get your `client_id` and `client_secret` for testing. In this example, we
-have enabled `password` grant types, let's try:
+1. Click **Create Client**.
+2. Set **Allowed Scope** to `profile`.
+3. Set **Allowed Grant Types** to `password`.
+4. Keep `client_secret_basic` as the token endpoint authentication method.
+5. Submit the form. The home page shows the `client_id` and `client_secret` of the new client.
 
-```
-$ curl -u ${client_id}:${client_secret} -XPOST http://127.0.0.1:5000/oauth/token -F grant_type=password -F username=${username} -F password=valid -F scope=profile
-```
-
-Because this is an example, every user's password is `valid`. Now you can access `/api/me`:
+Request a token with the password grant:
 
 ```bash
-$ curl -H "Authorization: Bearer ${access_token}" http://127.0.0.1:5000/api/me
+curl -u ${client_id}:${client_secret} -X POST http://127.0.0.1:5000/oauth/token \
+    -d grant_type=password -d username=${username} -d password=valid -d scope=profile
 ```
 
-### Authorization code flow example
+The server returns a token:
 
-To test the authorization code flow, you can just open this URL in your browser.
-```bash
-$ open http://127.0.0.1:5000/oauth/authorize?response_type=code&client_id=${client_id}&scope=profile
+```json
+{"access_token": "UGnmW1AnVJPWu9mLCbZwiWHHgW28An7Qq2uzBo5uQz", "expires_in": 864000, "refresh_token": "Z0kS5WFkCGUOGZZEoK9fFUXIxXGI4HiOKJzZ336KJlUKc4Hy", "scope": "profile", "token_type": "Bearer"}
 ```
 
-After granting the authorization, you should be redirected to `${redirect_uri}/?code=${code}`
-
-Then your app can send the code to the authorization server to get an access token:
+Call the protected resource with the access token:
 
 ```bash
-$ curl -u ${client_id}:${client_secret} -XPOST http://127.0.0.1:5000/oauth/token -F grant_type=authorization_code -F scope=profile -F code=${code}
+curl -H "Authorization: Bearer ${access_token}" http://127.0.0.1:5000/api/me
 ```
 
-Now you can access `/api/me`:
+```json
+{"id":1,"username":"alice"}
+```
+
+The other endpoints are `/oauth/authorize` and `/oauth/revoke`.
+Grant types and redirect URIs go one per line in the client form.
+
+## Configuration
+
+The server reads its configuration from environment variables.
+It also loads a `.env` file from the current directory.
+`example.env` lists the variables:
+
+| Variable | Default | Description |
+|---|---|---|
+| `SECRET_KEY` | random | Key that signs the session cookies. Without it, sessions end when the server restarts. |
+| `DATABASE_URL` | `sqlite:///db.sqlite` | SQLAlchemy database URL. In the Docker image, `sqlite:////data/db.sqlite`. |
+| `FLASK_RUN_HOST` | `127.0.0.1` | Address the server listens on. In the Docker image, `0.0.0.0`. |
+| `FLASK_RUN_PORT` | `5000` | Port the server listens on. |
+| `FLASK_DEBUG` | `False` | Set to `True` to enable the Flask debug mode. |
+| `PROXY_FIX` | `false` | Set to `true` behind a reverse proxy. |
+| `AUTHLIB_INSECURE_TRANSPORT` | unset | Set to `1` to accept plain HTTP requests. |
+
+Per RFC 6749 §3.1 and §3.2, the OAuth 2.0 endpoints require TLS.
+The server accepts plain HTTP on `localhost` and `127.0.0.1`.
+On other hosts, plain HTTP requests get an `insecure_transport` error, unless `AUTHLIB_INSECURE_TRANSPORT` is set.
+Never set it in production.
+
+## Run behind a reverse proxy
+
+Behind a reverse proxy or a load balancer, enable the proxy support:
 
 ```bash
-$ curl -H "Authorization: Bearer ${access_token}" http://127.0.0.1:5000/api/me
+export PROXY_FIX=true
 ```
 
-For now, you can read the source in example or follow the long boring tutorial below.
+The server then trusts the `X-Forwarded-Proto` and `X-Forwarded-Prefix` headers set by the closest proxy.
+When the proxy handles TLS, the server sees HTTPS requests and accepts them.
+Under a sub-path, the redirections start with the path prefix.
+The server also trusts `X-Forwarded-For`, which only changes the client address in the logs.
+Only enable it when a proxy is present.
+Without a proxy, clients could forge these headers.
 
-**IMPORTANT**: To test implicit grant, you need to `token_endpoint_auth_method` to `none`.
+The proxy must set `X-Forwarded-Proto` and forward the original `Host` header.
+It must also set `X-Forwarded-Prefix`, or clear it when the server is at the root of the domain.
+Otherwise clients could send their own prefix.
+With nginx, at the root of the domain:
 
-## Preparation
-
-Assume this example doesn't exist at all. Let's write an OAuth 2.0 server
-from scratch step by step.
-
-### Create folder structure
-
-Here is our Flask website structure:
-
-```
-app.py         --- FLASK_APP
-website/
-  app.py       --- Flask App Factory
-  __init__.py  --- module initialization (empty)
-  models.py    --- SQLAlchemy Models
-  oauth2.py    --- OAuth 2.0 Provider Configuration
-  routes.py    --- Routes views
-  templates/
+```nginx
+location / {
+    proxy_pass http://127.0.0.1:5000;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Prefix "";
+}
 ```
 
-### Installation
+Under a sub-path, the proxy removes the prefix from the request path and sends it in `X-Forwarded-Prefix`:
 
-Create a virtualenv and install all the requirements. You can also put the
-dependencies into `requirements.txt`:
-
-```
-Flask
-Flask-SQLAlchemy
-Authlib
-```
-
-### Hello World!
-
-Create a home route view to say "Hello World!". It is used to test if things
-working well.
-
-
-```python
-# website/routes.py
-from flask import Blueprint
-
-bp = Blueprint(__name__, "home")
-
-
-@bp.route("/")
-def home():
-    return "Hello World!"
+```nginx
+location /auth/ {
+    proxy_pass http://127.0.0.1:5000/;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Prefix /auth;
+}
 ```
 
-```python
-# website/app.py
-from flask import Flask
-from .routes import bp
+## Development
 
+Run the tests:
 
-def create_app(config=None):
-    app = Flask(__name__)
-    # load app specified configuration
-    if config is not None:
-        if isinstance(config, dict):
-            app.config.update(config)
-        elif config.endswith(".py"):
-            app.config.from_pyfile(config)
-    setup_app(app)
-    return app
-
-
-def setup_app(app):
-    app.register_blueprint(bp, url_prefix="")
+```bash
+uv run pytest
 ```
 
-```python
-# app.py
-from website.app import create_app
+Install the Git hooks that check the code style and the commit messages:
 
-app = create_app(
-    {
-        "SECRET_KEY": "secret",
-    }
-)
+```bash
+uv run prek install
 ```
-
-Create an empty ```__init__.py``` file in the ```website``` folder.
-
-The "Hello World!" example should run properly:
-
-    $ FLASK_APP=app.py flask run
-
-## Define Models
-
-We will use SQLAlchemy and SQLite for our models. You can also use other
-databases and other ORM engines. Authlib has some built-in SQLAlchemy mixins
-which will make it easier for creating models.
-
-Let's create the models in `website/models.py`. We need four models, which are
-
-- User: you need a user to test and create your application
-- OAuth2Client: the oauth client model
-- OAuth2AuthorizationCode: for `grant_type=code` flow
-- OAuth2Token: save the `access_token` in this model.
-
-Check how to define these models in `website/models.py`.
-
-Once you've created your own `website/models.py` (or copied our version), you'll need to import the database object `db`. Add the line `from .models import db` just after `from flask import Flask` in your scratch-built version of `website/app.py`.
-
-To initialize the database upon startup, if no tables exist, you'll add a few lines to the `setup_app()` function in `website/app.py` so that it now looks like:
-
-```python
-def setup_app(app):
-    # Create tables if they do not exist already
-    @app.before_first_request
-    def create_tables():
-        db.create_all()
-
-    db.init_app(app)
-    app.register_blueprint(bp, url_prefix="")
-```
-
-You can try running the app again as above to make sure it works.
-
-## Implement Grants
-
-The source code is in `website/oauth2.py`. There are four standard grant types:
-
-- Authorization Code Grant
-- Implicit Grant
-- Client Credentials Grant
-- Resource Owner Password Credentials Grant
-
-And Refresh Token is implemented as a Grant in Authlib. You don't have to do
-anything on Implicit and Client Credentials grants, but there are missing
-methods to be implemented in other grants. Check out the source code in
-`website/oauth2.py`.
-
-Once you've created your own `website/oauth2.py`, import the oauth2 config object from the oauth2 module. Add the line `from .oauth2 import config_oauth` just after the import you added above in your scratch-built version of `website/app.py`.
-
-To initialize the oauth object, add `config_oauth(app)` to the `setup_app()` function, just before the line that starts with `app.register_blueprint` so it looks like:
-
-```python
-def setup_app(app):
-    # Create tables if they do not exist already
-    @app.before_first_request
-    def create_tables():
-        db.create_all()
-
-    db.init_app(app)
-    config_oauth(app)
-    app.register_blueprint(bp, url_prefix="")
-```
-You can try running the app again as above to make sure it still works.
-
-## `@require_oauth`
-
-Authlib has provided a `ResourceProtector` for you to create the decorator
-`@require_oauth`, which can be easily implemented:
-
-```py
-from authlib.flask.oauth2 import ResourceProtector
-
-require_oauth = ResourceProtector()
-```
-
-For now, only Bearer Token is supported. Let's add bearer token validator to
-this ResourceProtector:
-
-```py
-from authlib.flask.oauth2.sqla import create_bearer_token_validator
-
-# helper function: create_bearer_token_validator
-bearer_cls = create_bearer_token_validator(db.session, OAuth2Token)
-require_oauth.register_token_validator(bearer_cls())
-```
-
-Check the full implementation in `website/oauth2.py`.
-
-
-## OAuth Routes
-
-For OAuth server itself, we only need to implement routes for authentication,
-and issuing tokens. Since we have added token revocation feature, we need a
-route for revoking too.
-
-Checkout these routes in `website/routes.py`. Their path begin with `/oauth/`.
-
-
-## Other Routes
-
-But that is not enough. In this demo, you will need to have some web pages to
-create and manage your OAuth clients. Check that `/create_client` route.
-
-And we have an API route for testing. Check the code of `/api/me`.
-
-
-## Finish
-
-Here you go. You've got an OAuth 2.0 server.
-
-Read more information on <https://docs.authlib.org/>.
 
 ## License
 
-Same license with [Authlib](https://authlib.org/plans).
+The server is distributed under the BSD 3-Clause license. See [LICENSE](LICENSE).

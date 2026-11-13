@@ -7,6 +7,8 @@ name = "authlib-server-demo"
 version = "0.1.0"
 description = "Demonstration OAuth 2.0 and OpenID Connect server built with Authlib"
 readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 keywords = ["oidc", "oauth", "oauth2", "openid", "identity", "authentication"]
 maintainers = [{name="Éloi Rivard", email="eloi@yaal.coop"}]
