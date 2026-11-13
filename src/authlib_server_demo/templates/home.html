@@ -1,8 +1,8 @@
 {% if user %}
-<style>pre{white-space:wrap}</style>
-<div>Logged in as <strong>{{user}}</strong> (<a href="{{ url_for('.logout') }}">Log Out</a>)</div>
+  <style>pre{white-space:wrap}</style>
+  <div>Logged in as <strong>{{user}}</strong> (<a href="{{ url_for('.logout') }}">Log Out</a>)</div>
 
-{% for client in clients %}
+  {% for client in clients %}
 <pre>
 <strong>Client Info</strong>
   {%- for key in client.client_info %}
@@ -13,14 +13,14 @@
   <strong>{{ key }}: </strong>{{ client.client_metadata[key] }}
   {%- endfor %}
 </pre>
-<hr>
-{% endfor %}
+    <hr>
+  {% endfor %}
 
-<br><a href="{{ url_for('.create_client') }}">Create Client</a>
+  <br><a href="{{ url_for('.create_client') }}">Create Client</a>
 
 {% else %}
-<form action="" method="post">
-  <input type="text" name="username" placeholder="username">
-  <button type="submit">Login / Signup</button>
-</form>
+  <form action="" method="post">
+    <input type="text" name="username" placeholder="username">
+    <button type="submit">Login / Signup</button>
+  </form>
 {% endif %}

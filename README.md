@@ -125,11 +125,13 @@ working well.
 ```python
 # website/routes.py
 from flask import Blueprint
-bp = Blueprint(__name__, 'home')
 
-@bp.route('/')
+bp = Blueprint(__name__, "home")
+
+
+@bp.route("/")
 def home():
-    return 'Hello World!'
+    return "Hello World!"
 ```
 
 ```python
@@ -137,28 +139,32 @@ def home():
 from flask import Flask
 from .routes import bp
 
+
 def create_app(config=None):
     app = Flask(__name__)
     # load app specified configuration
     if config is not None:
         if isinstance(config, dict):
             app.config.update(config)
-        elif config.endswith('.py'):
+        elif config.endswith(".py"):
             app.config.from_pyfile(config)
     setup_app(app)
     return app
 
+
 def setup_app(app):
-    app.register_blueprint(bp, url_prefix='')
+    app.register_blueprint(bp, url_prefix="")
 ```
 
 ```python
 # app.py
 from website.app import create_app
 
-app = create_app({
-    'SECRET_KEY': 'secret',
-})
+app = create_app(
+    {
+        "SECRET_KEY": "secret",
+    }
+)
 ```
 
 Create an empty ```__init__.py``` file in the ```website``` folder.
@@ -194,7 +200,7 @@ def setup_app(app):
         db.create_all()
 
     db.init_app(app)
-    app.register_blueprint(bp, url_prefix='')
+    app.register_blueprint(bp, url_prefix="")
 ```
 
 You can try running the app again as above to make sure it works.
@@ -226,7 +232,7 @@ def setup_app(app):
 
     db.init_app(app)
     config_oauth(app)
-    app.register_blueprint(bp, url_prefix='')
+    app.register_blueprint(bp, url_prefix="")
 ```
 You can try running the app again as above to make sure it still works.
 

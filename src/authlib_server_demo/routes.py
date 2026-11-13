@@ -1,12 +1,21 @@
 import time
-from flask import Blueprint, request, session, url_for
-from flask import render_template, redirect, jsonify
-from werkzeug.security import gen_salt
+
 from authlib.integrations.flask_oauth2 import current_token
 from authlib.oauth2 import OAuth2Error
-from .models import db, User, OAuth2Client
-from .oauth2 import authorization, require_oauth
+from flask import Blueprint
+from flask import jsonify
+from flask import redirect
+from flask import render_template
+from flask import request
+from flask import session
+from flask import url_for
+from werkzeug.security import gen_salt
 
+from .models import OAuth2Client
+from .models import User
+from .models import db
+from .oauth2 import authorization
+from .oauth2 import require_oauth
 
 bp = Blueprint("home", __name__)
 

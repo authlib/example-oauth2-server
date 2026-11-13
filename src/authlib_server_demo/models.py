@@ -1,10 +1,9 @@
 import time
+
+from authlib.integrations.sqla_oauth2 import OAuth2AuthorizationCodeMixin
+from authlib.integrations.sqla_oauth2 import OAuth2ClientMixin
+from authlib.integrations.sqla_oauth2 import OAuth2TokenMixin
 from flask_sqlalchemy import SQLAlchemy
-from authlib.integrations.sqla_oauth2 import (
-    OAuth2ClientMixin,
-    OAuth2AuthorizationCodeMixin,
-    OAuth2TokenMixin,
-)
 
 db = SQLAlchemy()
 
