@@ -9,15 +9,15 @@ resolution-markers = [
 
 [[package]]
 name = "authlib"
-version = "1.9.5"
+version = "1.10.0b1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
     { name = "joserfc" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/04/96/6e7ed72bb49762a9b65d51c4cb235d793f0485cd8d6f7e9404ce955a4808/authlib-1.9.5.tar.gz", hash = "sha256:3f031d5e9b6486089e91e8f7f1b68f36275f3151c66460d650fc90d420545fd7", size = 183564, upload-time = "2026-11-05T16:13:18.409Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e8/6e/f0dbb933139ab8a55b50d27390e3c9b30611568e87df71934dbad8c10370/authlib-1.10.0b1.tar.gz", hash = "sha256:76b552ad6ff7b24cde68031b14cb8ba80e75259b87ea52cb5222e098be00d0a4", size = 233462, upload-time = "2026-11-12T15:37:56.273Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/58/d7/d384e7a639dd1d018767ba0fe39601b61cded066bb7af38db31ec998252d/authlib-1.9.5-py2.py3-none-any.whl", hash = "sha256:e32a63e3d869196b61816b2602231862179a2ffc29358c009d1f022c8b86a8b2", size = 267074, upload-time = "2026-11-05T16:13:16.766Z" },
+    { url = "https://files.pythonhosted.org/packages/b5/2c/b47e939ad0f1fa21554c8851ca0105b00c6a1875e768d49369f92e9019a9/authlib-1.10.0b1-py3-none-any.whl", hash = "sha256:7f74d622e802d528d244737165f9054908ae356992c397f24880bdc57809bdb4", size = 327120, upload-time = "2026-11-12T15:37:54.394Z" },
 ]
 
 [[package]]
@@ -43,7 +43,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "authlib", specifier = ">=1.6.5" },
+    { name = "authlib", specifier = ">=1.10.0b1" },
     { name = "flask", specifier = ">=3.1.2" },
     { name = "flask-sqlalchemy", specifier = ">=3.1.1" },
     { name = "python-dotenv", specifier = ">=1.2.4" },

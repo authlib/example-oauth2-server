@@ -1,3 +1,6 @@
+from urllib.parse import urlencode
+from urllib.parse import urlparse
+
 import pytest
 
 from authlib_server_demo.models import OAuth2Client
@@ -31,14 +34,28 @@ def test_login_redirects_to_next(testapp):
     assert res.location.endswith("/create_client")
 
 
-@pytest.mark.xfail(
-    strict=True,
-    raises=AssertionError,
-    reason="home() redirects to any 'next' URL",
+@pytest.mark.parametrize(
+    "next_url",
+    [
+        "https://evil.test/",
+        "//evil.test/",
+        "/\\evil.test/",
+        "/\t/evil.test/",
+        "/\n/evil.test/",
+        " //evil.test/",
+        "evil.test",
+    ],
 )
-def test_login_ignores_an_external_next(testapp):
-    res = testapp.post("/?next=https://evil.test/", {"username": "bob"})
-    assert not res.location.startswith("https://evil.test")
+def test_login_ignores_an_external_next(testapp, next_url):
+    res = testapp.post("/?" + urlencode({"next": next_url}), {"username": "bob"})
+    location = urlparse(res.location)
+    assert location.netloc in ("", "localhost")
+    assert location.path == "/"
+
+
+def test_logout_without_a_user(testapp):
+    res = testapp.get("/logout")
+    assert res.location.endswith("/")
 
 
 def test_logout(logged_in):

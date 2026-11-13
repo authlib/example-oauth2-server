@@ -21,10 +21,16 @@ bp = Blueprint("home", __name__)
 
 
 def current_user():
-    if "id" in session:
-        uid = session["id"]
-        return User.query.get(uid)
-    return None
+    if "id" not in session:
+        return None
+    return db.session.get(User, session["id"])
+
+
+def is_local_path(url):
+    """Tell whether the URL is a path on this server, and not another site."""
+    if not url.isprintable() or "\\" in url:
+        return False
+    return url.startswith("/") and not url.startswith("//")
 
 
 def split_by_crlf(s):
@@ -41,9 +47,8 @@ def home():
             db.session.add(user)
             db.session.commit()
         session["id"] = user.id
-        # if user is not just to log in, but need to head back to the auth page, then go for it
         next_page = request.args.get("next")
-        if next_page:
+        if next_page and is_local_path(next_page):
             return redirect(next_page)
         return redirect("/")
     user = current_user()
@@ -57,7 +62,7 @@ def home():
 
 @bp.route("/logout")
 def logout():
-    del session["id"]
+    session.pop("id", None)
     return redirect("/")
 
 
@@ -102,23 +107,23 @@ def create_client():
 @bp.route("/oauth/authorize", methods=["GET", "POST"])
 def authorize():
     user = current_user()
-    # if user log status is not true (Auth server), then to log it in
     if not user:
-        return redirect(url_for("home.home", next=request.url))
+        return redirect(
+            url_for("home.home", next=request.script_root + request.full_path)
+        )
+
+    try:
+        grant = authorization.get_consent_grant(end_user=user)
+    except OAuth2Error as error:
+        return authorization.handle_error_response(request, error)
+
     if request.method == "GET":
-        try:
-            grant = authorization.get_consent_grant(end_user=user)
-        except OAuth2Error as error:
-            return error.error
         return render_template("authorize.html", user=user, grant=grant)
-    if not user and "username" in request.form:
-        username = request.form.get("username")
-        user = User.query.filter_by(username=username).first()
-    if request.form["confirm"]:
-        grant_user = user
-    else:
-        grant_user = None
-    return authorization.create_authorization_response(grant_user=grant_user)
+
+    grant_user = user if "confirm" in request.form else None
+    return authorization.create_authorization_response(
+        grant=grant, grant_user=grant_user
+    )
 
 
 @bp.route("/oauth/token", methods=["POST"])

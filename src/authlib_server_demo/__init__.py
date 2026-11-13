@@ -18,6 +18,9 @@ def create_app(config=None):
         "DATABASE_URL", "sqlite:///db.sqlite"
     )
     app.config["OAUTH2_REFRESH_TOKEN_GENERATOR"] = True
+    # Browsers do not send the session cookie with cross-site POST requests,
+    # such as a forged consent form.
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
     if config:
         app.config.update(config)

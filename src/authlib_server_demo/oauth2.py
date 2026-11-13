@@ -1,3 +1,5 @@
+import time
+
 from authlib.integrations.flask_oauth2 import AuthorizationServer
 from authlib.integrations.flask_oauth2 import ResourceProtector
 from authlib.integrations.sqla_oauth2 import create_bearer_token_validator
@@ -22,12 +24,12 @@ class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
     ]
 
     def save_authorization_code(self, code, request):
-        code_challenge = request.data.get("code_challenge")
-        code_challenge_method = request.data.get("code_challenge_method")
+        code_challenge = request.payload.data.get("code_challenge")
+        code_challenge_method = request.payload.data.get("code_challenge_method")
         auth_code = OAuth2AuthorizationCode(
             code=code,
             client_id=request.client.client_id,
-            redirect_uri=request.redirect_uri,
+            redirect_uri=request.payload.redirect_uri,
             scope=request.scope,
             user_id=request.user.id,
             code_challenge=code_challenge,
@@ -49,7 +51,7 @@ class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
         db.session.commit()
 
     def authenticate_user(self, authorization_code):
-        return User.query.get(authorization_code.user_id)
+        return db.session.get(User, authorization_code.user_id)
 
 
 class PasswordGrant(grants.ResourceOwnerPasswordCredentialsGrant):
@@ -66,11 +68,12 @@ class RefreshTokenGrant(grants.RefreshTokenGrant):
             return token
 
     def authenticate_user(self, credential):
-        return User.query.get(credential.user_id)
+        return db.session.get(User, credential.user_id)
 
     def revoke_old_credential(self, credential):
-        credential.revoked = True
-        db.session.add(credential)
+        now = int(time.time())
+        credential.access_token_revoked_at = now
+        credential.refresh_token_revoked_at = now
         db.session.commit()
 
 
@@ -89,7 +92,7 @@ def config_oauth(app):
     # support all grants
     authorization.register_grant(grants.ImplicitGrant)
     authorization.register_grant(grants.ClientCredentialsGrant)
-    authorization.register_grant(AuthorizationCodeGrant, [CodeChallenge(required=True)])
+    authorization.register_grant(AuthorizationCodeGrant, [CodeChallenge()])
     authorization.register_grant(PasswordGrant)
     authorization.register_grant(RefreshTokenGrant)
 

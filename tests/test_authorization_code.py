@@ -1,10 +1,8 @@
 from urllib.parse import parse_qs
 from urllib.parse import urlparse
 
-import pytest
 from authlib.common.security import generate_token
 from authlib.oauth2.rfc7636 import create_s256_code_challenge
-from webtest import AppError
 
 from tests.utils import REDIRECT_URI
 from tests.utils import authorize_url
@@ -70,11 +68,6 @@ def test_authorization_code_flow(logged_in, client, user):
     assert res.json == {"id": user["id"], "username": user["username"]}
 
 
-@pytest.mark.xfail(
-    strict=True,
-    raises=AppError,
-    reason="authorize() reads the unchecked 'confirm' box with request.form[]",
-)
 def test_consent_denied(logged_in, client):
     res = consent(logged_in, code_url(client), accept=False)
     params = callback_params(res)
@@ -114,7 +107,13 @@ def test_pkce_is_optional_for_confidential_clients(logged_in, client):
 
 def test_pkce_is_required_for_public_clients(logged_in, public_client):
     url = code_url(public_client, code_challenge=None, code_challenge_method=None)
-    params = callback_params(consent(logged_in, url))
+    params = callback_params(logged_in.get(url))
+    assert params["error"] == "invalid_request"
+    assert params["state"] == "xyz"
+
+
+def test_public_clients_must_send_the_code_verifier(logged_in, public_client):
+    params = callback_params(consent(logged_in, code_url(public_client)))
 
     res = logged_in.post(
         "/oauth/token",
@@ -145,11 +144,6 @@ def test_wrong_code_verifier(logged_in, client):
     assert res.json["error"] == "invalid_grant"
 
 
-@pytest.mark.xfail(
-    strict=True,
-    raises=AppError,
-    reason="authorize() returns the error code as a 200 plain text body",
-)
 def test_unknown_client(logged_in):
     res = logged_in.get(code_url({"client_id": "unknown"}), status=400)
     assert "invalid_client" in res

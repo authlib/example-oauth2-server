@@ -12,7 +12,7 @@ keywords = ["oidc", "oauth", "oauth2", "openid", "identity", "authentication"]
 maintainers = [{name="Éloi Rivard", email="eloi@yaal.coop"}]
 
 dependencies = [
-    "authlib>=1.6.5",
+    "authlib>=1.10.0b1",
     "flask>=3.1.2",
     "flask-sqlalchemy>=3.1.1",
     "python-dotenv>=1.2.4",
@@ -128,4 +128,9 @@ commands_pre = [
 commands = [
     ["pytest", "--cov", "--cov-report", "term:skip-covered", "{posargs}"],
     ["coverage", "html"],
+]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error",
 ]

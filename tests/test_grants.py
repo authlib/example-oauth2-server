@@ -1,5 +1,3 @@
-import pytest
-
 from tests.utils import REDIRECT_URI
 from tests.utils import authorize_url
 from tests.utils import basic_auth
@@ -48,11 +46,6 @@ def test_wrong_client_secret(testapp, client):
     assert res.json["error"] == "invalid_client"
 
 
-@pytest.mark.xfail(
-    strict=True,
-    raises=AttributeError,
-    reason="OAuth2Token uses the 'revoked' attribute, removed in Authlib 1.0",
-)
 def test_refresh_token_grant(testapp, client, user):
     first = password_token(testapp, client, user).json
 

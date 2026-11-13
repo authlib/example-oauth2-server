@@ -7,7 +7,7 @@ from tests.utils import password_token
 
 def test_api_me_needs_a_token(testapp):
     res = testapp.get("/api/me", status=401)
-    assert res.json["error"] == "missing_authorization"
+    assert res.headers["WWW-Authenticate"] == "Bearer"
 
 
 def test_api_me_rejects_an_unknown_token(testapp):
