@@ -1,7 +1,7 @@
 import pytest
 
-from authlib_server_demo import create_app
-from authlib_server_demo.models import db
+from website import create_app
+from website.models import db
 
 
 @pytest.fixture

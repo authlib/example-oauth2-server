@@ -2,21 +2,10 @@ import os
 import secrets
 
 from flask import Flask
-from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .models import db
 from .oauth2 import config_oauth
 from .routes import bp
-
-
-def is_proxy_fix_enabled():
-    """Read from the environment whether the application runs behind a proxy."""
-    value = os.environ.get("PROXY_FIX", "").strip().lower()
-    if value in ("", "0", "false"):
-        return False
-    if value in ("1", "true"):
-        return True
-    raise ValueError(f"PROXY_FIX must be true or false, got {value!r}")
 
 
 def create_app(config=None):
@@ -36,9 +25,6 @@ def create_app(config=None):
 
     if config:
         app.config.update(config)
-
-    if is_proxy_fix_enabled():
-        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_prefix=1)
 
     setup_app(app)
     return app

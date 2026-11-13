@@ -3,8 +3,8 @@ from urllib.parse import urlparse
 
 import pytest
 
-from authlib_server_demo.models import OAuth2Client
-from authlib_server_demo.models import User
+from website.models import OAuth2Client
+from website.models import User
 
 
 def test_home_shows_the_login_form(testapp):

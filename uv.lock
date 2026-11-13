@@ -21,45 +21,6 @@ wheels = [
 ]
 
 [[package]]
-name = "authlib-server-demo"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "authlib" },
-    { name = "flask" },
-    { name = "flask-sqlalchemy" },
-    { name = "python-dotenv" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "flask-webtest" },
-    { name = "prek" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "tox-uv" },
-    { name = "webtest" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "authlib", specifier = ">=1.10.0b1" },
-    { name = "flask", specifier = ">=3.1.2" },
-    { name = "flask-sqlalchemy", specifier = ">=3.1.1" },
-    { name = "python-dotenv", specifier = ">=1.2.4" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "flask-webtest", specifier = ">=0.1.6" },
-    { name = "prek", specifier = ">=0.5.10" },
-    { name = "pytest", specifier = ">=9.2.0" },
-    { name = "pytest-cov", specifier = ">=7.1.0" },
-    { name = "tox-uv", specifier = ">=1.37.7" },
-    { name = "webtest", specifier = ">=3.0.7" },
-]
-
-[[package]]
 name = "beautifulsoup4"
 version = "4.6.3"
 source = { registry = "https://pypi.org/simple" }
@@ -427,6 +388,43 @@ wheels = [
 ]
 
 [[package]]
+name = "example-oauth2-server"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "authlib" },
+    { name = "flask" },
+    { name = "flask-sqlalchemy" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "flask-webtest" },
+    { name = "prek" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "tox-uv" },
+    { name = "webtest" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "authlib", specifier = ">=1.10.0b1" },
+    { name = "flask", specifier = ">=3.1.2" },
+    { name = "flask-sqlalchemy", specifier = ">=3.1.1" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "flask-webtest", specifier = ">=0.1.6" },
+    { name = "prek", specifier = ">=0.5.10" },
+    { name = "pytest", specifier = ">=9.2.0" },
+    { name = "pytest-cov", specifier = ">=7.1.0" },
+    { name = "tox-uv", specifier = ">=1.37.7" },
+    { name = "webtest", specifier = ">=3.0.7" },
+]
+
+[[package]]
 name = "filelock"
 version = "4.2.10"
 source = { registry = "https://pypi.org/simple" }
@@ -772,15 +770,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/68/55/70b46fae646bc6f5cb5e82569949d925cff1c7b5ce20ec4a11e0d977f8c6/python_discovery-1.9.5.tar.gz", hash = "sha256:86279f5d2728bc067de28b7ddc571be2eacc2ae0e7048f8629d2481a0f8848a2", size = 141121, upload-time = "2026-11-06T15:32:11.331Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ac/35/25bd092ca8a7e71192afdca67fbff4f797da74408e74ac3626e13b409ec0/python_discovery-1.9.5-py3-none-any.whl", hash = "sha256:a1fae8fca11e4bc61e38491c2aafff29e430b3c5e272d51ae52fb895bc4c0fac", size = 44377, upload-time = "2026-11-06T15:32:09.821Z" },
-]
-
-[[package]]
-name = "python-dotenv"
-version = "1.2.4"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/74/26/2fbeedb218a787a5eea551c7532cac4e009f83d689dd2faa0d0353473f86/python_dotenv-1.2.4.tar.gz", hash = "sha256:f0d53e69935a851c0dcc78f3ab7aaccd8cabef0b92382b576b824212902873c0", size = 60824, upload-time = "2026-10-01T05:36:10Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/60/d1/38f3a3405989a89ac18390803e70c6ad7c7760da4f9b83cbeca0c44a0c72/python_dotenv-1.2.4-py3-none-any.whl", hash = "sha256:42269a8a5b3fd54ffa6f3d84b18abed50064717576b4ecf03dc4a55d8aa04fdc", size = 23266, upload-time = "2026-10-01T05:36:08.633Z" },
 ]
 
 [[package]]

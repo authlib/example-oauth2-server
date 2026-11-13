@@ -3,33 +3,15 @@ import time
 import pytest
 from flask_webtest import TestApp
 
-from authlib_server_demo import create_app
-from authlib_server_demo.models import OAuth2Client
-from authlib_server_demo.models import User
-from authlib_server_demo.models import db
 from tests.utils import REDIRECT_URI
+from website import create_app
+from website.models import OAuth2Client
+from website.models import User
+from website.models import db
 
 
 @pytest.fixture
-def proxy_fix():
-    """Return whether the application runs behind a reverse proxy."""
-    return False
-
-
-@pytest.fixture
-def insecure_transport():
-    """Return whether Authlib accepts plain HTTP requests."""
-    return True
-
-
-@pytest.fixture
-def app(monkeypatch, proxy_fix, insecure_transport):
-    monkeypatch.setenv("PROXY_FIX", str(proxy_fix))
-    if insecure_transport:
-        monkeypatch.setenv("AUTHLIB_INSECURE_TRANSPORT", "1")
-    else:
-        monkeypatch.delenv("AUTHLIB_INSECURE_TRANSPORT", raising=False)
-
+def app():
     app = create_app(
         {
             "TESTING": True,

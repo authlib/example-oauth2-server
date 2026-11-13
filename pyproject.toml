@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "authlib-server-demo"
+name = "example-oauth2-server"
 version = "0.1.0"
-description = "Demonstration OAuth 2.0 and OpenID Connect server built with Authlib"
+description = "Example of OAuth 2.0 server built with Authlib"
 readme = "README.md"
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]
@@ -17,14 +17,10 @@ dependencies = [
     "authlib>=1.10.0b1",
     "flask>=3.1.2",
     "flask-sqlalchemy>=3.1.1",
-    "python-dotenv>=1.2.4",
 ]
 
 [project.urls]
 repository = "https://github.com/authlib/example-oauth2-server"
-
-[project.scripts]
-authlib-server-demo = "authlib_server_demo.cli:run"
 
 [dependency-groups]
 dev = [
@@ -37,11 +33,11 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/authlib_server_demo"]
+packages = ["src/website"]
 
 [tool.coverage.run]
 source = [
-    "authlib_server_demo",
+    "website",
     "tests",
 ]
 omit = [".tox/*"]

@@ -1,8 +1,8 @@
-from authlib_server_demo.models import OAuth2Client
-from authlib_server_demo.models import db
 from tests.utils import basic_auth
 from tests.utils import bearer
 from tests.utils import password_token
+from website.models import OAuth2Client
+from website.models import db
 
 
 def test_api_me_needs_a_token(testapp):
