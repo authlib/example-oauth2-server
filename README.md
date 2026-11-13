@@ -35,7 +35,7 @@ $ export AUTHLIB_INSECURE_TRANSPORT=1
 Create Database and run the development server:
 
 ```bash
-$ uv run flask run
+$ uv run authlib-server-demo
 ```
 
 Now, you can open your browser with `http://127.0.0.1:5000/`, login with any

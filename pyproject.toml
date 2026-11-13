@@ -1,16 +1,131 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "example-oauth2-server"
+name = "authlib-server-demo"
 version = "0.1.0"
-description = "Example for OAuth 2 Server for Authlib."
+description = "Demonstration OAuth 2.0 and OpenID Connect server built with Authlib"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
+keywords = ["oidc", "oauth", "oauth2", "openid", "identity", "authentication"]
+maintainers = [{name="Éloi Rivard", email="eloi@yaal.coop"}]
+
 dependencies = [
     "authlib>=1.6.5",
     "flask>=3.1.2",
-    "flask-SQLAlchemy>=3.1.1",
+    "flask-sqlalchemy>=3.1.1",
+    "python-dotenv>=1.2.4",
 ]
+
+[project.urls]
+repository = "https://github.com/authlib/example-oauth2-server"
+
+[project.scripts]
+authlib-server-demo = "authlib_server_demo.cli:run"
 
 [dependency-groups]
 dev = [
-    "prek>=0.2.19",
+    "flask-webtest>=0.1.6",
+    "prek>=0.5.10",
+    "pytest>=9.2.0",
+    "pytest-cov>=7.1.0",
+    "tox-uv>=1.37.7",
+    "webtest>=3.0.7",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/authlib_server_demo"]
+
+[tool.coverage.run]
+source = [
+    "authlib_server_demo",
+    "tests",
+]
+omit = [".tox/*"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "@pytest.mark.skip",
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "except ImportError",
+    "if app.debug",
+    "pass",
+    "if TYPE_CHECKING",
+]
+
+[tool.ruff.lint]
+select = [
+    "D", # pydocstyle
+    "B", # flake8-bugbear
+    "E", # pycodestyle
+    "F", # pyflakes
+    "I", # isort
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501", # line-too-long
+    "E722", # bare-except
+    "D100", # public module
+    "D101", # public class
+    "D102", # public method
+    "D103", # public function
+    "D104", # public package
+    "D105", # magic method
+    "D106", # nested class
+    "D107", # public init
+    "D203", # no-blank-line-before-class
+    "D213", # multi-line-summary-second-line
+]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.tox]
+requires = ["tox>=4.19"]
+env_list = [
+    "style",
+    "py311",
+    "py312",
+    "py313",
+    "py314",
+    "py315",
+    "minversions",
+    "coverage",
+]
+
+[tool.tox.env_run_base]
+runner = "uv-venv-lock-runner"
+dependency_groups = ["dev"]
+commands = [
+    ["pytest", "--showlocals", "--full-trace", "{posargs}"],
+]
+
+[tool.tox.env.style]
+skip_install = true
+runner = "uv-venv-runner"
+commands = [
+    ["prek", "run", "--all-files", "--show-diff-on-failure"],
+]
+
+[tool.tox.env.minversions]
+runner = "uv-venv-runner"
+basepython = ["python3.11"]
+skip_install = true
+dependency_groups = []
+allowlist_externals = ["uv"]
+# A single install step, so the test dependencies do not upgrade the lowest versions.
+commands_pre = [
+    ["uv", "pip", "install", "--python", "{env_python}", "--resolution", "lowest-direct", "--group", "dev", "-e", "."],
+]
+
+[tool.tox.env.coverage]
+commands = [
+    ["pytest", "--cov", "--cov-report", "term:skip-covered", "{posargs}"],
+    ["coverage", "html"],
 ]
