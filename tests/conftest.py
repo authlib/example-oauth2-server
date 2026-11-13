@@ -10,34 +10,37 @@ from authlib_server_demo.models import db
 from tests.utils import REDIRECT_URI
 
 
-@pytest.fixture(scope="session")
-def app():
-    """Create the application once.
+@pytest.fixture
+def proxy_fix():
+    """Return whether the application runs behind a reverse proxy."""
+    return False
 
-    The authorization server is global, so each call to ``create_app``
-    would register the grants again.
-    """
-    with pytest.MonkeyPatch.context() as monkeypatch:
+
+@pytest.fixture
+def insecure_transport():
+    """Return whether Authlib accepts plain HTTP requests."""
+    return True
+
+
+@pytest.fixture
+def app(monkeypatch, proxy_fix, insecure_transport):
+    monkeypatch.setenv("PROXY_FIX", str(proxy_fix))
+    if insecure_transport:
         monkeypatch.setenv("AUTHLIB_INSECURE_TRANSPORT", "1")
-        app = create_app(
-            {
-                "TESTING": True,
-                "SECRET_KEY": "test-secret-key",
-                "SQLALCHEMY_DATABASE_URI": "sqlite://",
-            }
-        )
-        yield app
+    else:
+        monkeypatch.delenv("AUTHLIB_INSECURE_TRANSPORT", raising=False)
+
+    app = create_app(
+        {
+            "TESTING": True,
+            "SECRET_KEY": "test-secret-key",
+            "SQLALCHEMY_DATABASE_URI": "sqlite://",
+        }
+    )
+    yield app
 
     with app.app_context():
         db.engine.dispose()
-
-
-@pytest.fixture(autouse=True)
-def database(app):
-    """Start each test with empty tables."""
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
 
 
 @pytest.fixture

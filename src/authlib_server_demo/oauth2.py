@@ -83,23 +83,18 @@ authorization = AuthorizationServer(
     query_client=query_client,
     save_token=save_token,
 )
+authorization.register_grant(grants.ImplicitGrant)
+authorization.register_grant(grants.ClientCredentialsGrant)
+authorization.register_grant(AuthorizationCodeGrant, [CodeChallenge()])
+authorization.register_grant(PasswordGrant)
+authorization.register_grant(RefreshTokenGrant)
+authorization.register_endpoint(create_revocation_endpoint(db.session, OAuth2Token))
+
 require_oauth = ResourceProtector()
+require_oauth.register_token_validator(
+    create_bearer_token_validator(db.session, OAuth2Token)()
+)
 
 
 def config_oauth(app):
     authorization.init_app(app)
-
-    # support all grants
-    authorization.register_grant(grants.ImplicitGrant)
-    authorization.register_grant(grants.ClientCredentialsGrant)
-    authorization.register_grant(AuthorizationCodeGrant, [CodeChallenge()])
-    authorization.register_grant(PasswordGrant)
-    authorization.register_grant(RefreshTokenGrant)
-
-    # support revocation
-    revocation_cls = create_revocation_endpoint(db.session, OAuth2Token)
-    authorization.register_endpoint(revocation_cls)
-
-    # protect resource
-    bearer_cls = create_bearer_token_validator(db.session, OAuth2Token)
-    require_oauth.register_token_validator(bearer_cls())

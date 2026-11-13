@@ -50,7 +50,7 @@ def home():
         next_page = request.args.get("next")
         if next_page and is_local_path(next_page):
             return redirect(next_page)
-        return redirect("/")
+        return redirect(url_for("home.home"))
     user = current_user()
     if user:
         clients = OAuth2Client.query.filter_by(user_id=user.id).all()
@@ -63,14 +63,14 @@ def home():
 @bp.route("/logout")
 def logout():
     session.pop("id", None)
-    return redirect("/")
+    return redirect(url_for("home.home"))
 
 
 @bp.route("/create_client", methods=("GET", "POST"))
 def create_client():
     user = current_user()
     if not user:
-        return redirect("/")
+        return redirect(url_for("home.home"))
     if request.method == "GET":
         return render_template("create_client.html")
 
@@ -101,7 +101,7 @@ def create_client():
 
     db.session.add(client)
     db.session.commit()
-    return redirect("/")
+    return redirect(url_for("home.home"))
 
 
 @bp.route("/oauth/authorize", methods=["GET", "POST"])
